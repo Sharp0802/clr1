@@ -1,0 +1,10 @@
+[package]
+name = "clr1-test"
+version = "0.1.0"
+edition = "2024"
+
+[build-dependencies]
+clr1-build = { path = "../clr1-build" }
+
+[dependencies]
+clr1 = { path = "../clr1" }
