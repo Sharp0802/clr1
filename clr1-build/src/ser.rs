@@ -2,6 +2,7 @@ use serde::{ser, Serialize};
 use std::fmt::{Debug, Display};
 use std::io::Write;
 use std::string::FromUtf8Error;
+use serde::__private228::de::IdentifierDeserializer;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -172,11 +173,62 @@ impl<W: Write> ser::Serializer for &mut Ser<W> {
     }
 
     fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
-        write!(self.writer, "'{}'", v)?;
+        match v {
+            '\'' => {
+                self.writer.write(b"\\'")?;
+            }
+            '\t' => {
+                self.writer.write(b"'\\t'")?;
+            }
+            '\n' => {
+                self.writer.write(b"'\\n'")?;
+            }
+            '\r' => {
+                self.writer.write(b"'\\r'")?;
+            }
+            '\\' => {
+                self.writer.write(b"'\\\\'")?;
+            }
+            v => {
+                if v.is_control() {
+                    write!(self.writer, "'\\u{{{:X}}}'", v as u32)?;
+                } else {
+                    write!(self.writer, "'{}'", v)?;
+                }
+            }
+        }
+
         Ok(())
     }
     fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
-        write!(self.writer, "\"{}\"", v)?;
+        write!(self.writer, "\"")?;
+        for ch in v.chars() {
+            match ch {
+                '"' => {
+                    self.writer.write(b"\\\"")?;
+                }
+                '\t' => {
+                    self.writer.write(b"\\t")?;
+                }
+                '\n' => {
+                    self.writer.write(b"\\n")?;
+                }
+                '\r' => {
+                    self.writer.write(b"\\r")?;
+                }
+                '\\' => {
+                    self.writer.write(b"\\\\")?;
+                }
+                ch => {
+                    if ch.is_control() {
+                        write!(self.writer, "\\u{{{:X}}}", ch as u32)?;
+                    } else {
+                        write!(self.writer, "{}", ch)?;
+                    }
+                }
+            }
+        }
+        write!(self.writer, "\"")?;
         Ok(())
     }
 

@@ -15,6 +15,16 @@ impl Consume for char {
     }
 }
 
+impl Consume for str {
+    fn consume(&self, from: &str) -> Option<usize> {
+        if from.starts_with(self) {
+            Some(self.len())
+        } else {
+            None
+        }
+    }
+}
+
 impl Consume for RangeInclusive<char> {
     fn consume(&self, from: &str) -> Option<usize> {
         let Some(ch) = from.chars().next() else {
@@ -103,7 +113,8 @@ impl Consume for [Pattern] {
 impl Consume for Pattern {
     fn consume(&self, from: &str) -> Option<usize> {
         match self {
-            Pattern::Char(ch) => ch.consume(from),
+            Pattern::Reference(_, _) => None,
+            Pattern::Literal(str) => str.consume(from),
             Pattern::Class(class) => class.consume(from),
             Pattern::Quantifier(quantifier) => quantifier.consume(from),
             Pattern::Group(group) => group.consume(from),

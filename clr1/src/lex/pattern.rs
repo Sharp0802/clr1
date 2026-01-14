@@ -16,7 +16,8 @@ pub struct Quantifier {
 }
 
 pub enum Pattern {
-    Char(char),
+    Reference(usize, Option<usize>),
+    Literal(&'static str),
     Class(Class),
     Quantifier(Quantifier),
     Group(&'static [Pattern]),

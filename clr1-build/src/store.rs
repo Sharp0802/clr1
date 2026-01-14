@@ -2,12 +2,12 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use std::ops::Index;
 
-pub struct Store<'a, T: Eq + Hash> {
-    map: HashMap<&'a T, usize>,
+pub struct Store<T: Eq + Hash> {
+    map: HashMap<T, usize>,
     list: Vec<T>
 }
 
-impl<'a, T: Eq + Hash> Store<'a, T> {
+impl<T: Eq + Hash> Store<T> {
     pub fn new() -> Self {
         Self { map: HashMap::new(), list: Vec::new() }
     }
@@ -23,7 +23,7 @@ impl<'a, T: Eq + Hash> Store<'a, T> {
     }
 }
 
-impl<'a, T: Eq + Hash> Index<usize> for Store<'a, T> {
+impl<T: Eq + Hash> Index<usize> for Store<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
